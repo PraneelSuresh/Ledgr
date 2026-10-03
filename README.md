@@ -1,68 +1,121 @@
-# Personal Finance Tracker
+# Ledgr 
 
-A lightweight, CLI-based financial management tool built in Python. Track daily transactions, manage spending categories, and gain clear insight into income, total expenses, and net balance—all saved locally in a structured CSV format.
+A modern, local-first personal finance tracking application built with **Python**, **Flask**, and **Chart.js**. Effortlessly track income and expenses, organize transactions by category, and visualize spending habits—all stored locally on your device in structured CSV files with zero database setup required.
+
+Available both as a standalone **Windows executable (.exe)** and a lightweight **Python web application**.
 
 ---
 
 ## Key Features
 
-* **Transaction Logging**: Easily record income and expenses with validated fields, including Date, Type, Category, Expense Type, Description, and Notes.
-* **Automated Data Formatting**: Enforces valid date inputs (`YYYY-MM-DD`), transaction types (`Income` or `Expense`), and spending classifications (`Needs`, `Wants`, `Emergency`, `Savings`, `Investment`).
-* **Transaction Management**: View formatted tabular records or delete transactions by ID with automatic index re-sorting.
-* **Financial Overview**: Calculate total income, total expenses, and overall remaining balance in a unified view.
-* **Category Breakdown**: Aggregate total expenditures across custom categories or uncategorized entries.
-* **Persistent Local Storage**: Automatically saves all user data to a structured `transactions.csv` file without requiring an external database setup.
+- **Interactive Web Dashboard**: Monitor total balance, monthly income, and monthly expenses at a glance with real-time color-coded cards and recent activity tables.
+- **Transaction Management**: 
+  - Add, edit, or delete transactions via a modal interface.
+  - Automatic index re-sorting and ID management on updates and deletions.
+- **Dynamic Timeframe & Category Filtering**: Filter transaction histories by timeframes (*This Week*, *This Month*, *All Time*) and transaction types (*Income*, *Expense*, *All Types*).
+- **Visual Analytics**: Interactive bar charts (top spending categories) and doughnut charts (breakdown by *Needs*, *Wants*, *Savings*, *Investment*, and *Emergency*) powered by Chart.js.
+- **Flexible Expense Classification**: Categorize entries into financial buckets (*Needs*, *Wants*, *Savings*, *Investment*, *Emergency*) to align with budgeting rules.
+- **Persistent Local Data**: All data lives locally on your machine in `transactions.csv` and `filtered_transactions.csv`—keeping your financial records private.
+- **Standalone Binary (.exe)**: Run as a native application without needing Python or external dependencies installed.
 
 ---
 
 ## Tech Stack
 
-* **Language**: Python 3
-* **Standard Modules**: `csv`, `datetime`, `sys`
-* **Third-Party Libraries**: `tabulate` (for rendering ASCII tables in the terminal)
+- **Backend**: Python 3, Flask, Jinja2 Templates
+- **Frontend**: HTML5, CSS3 (Custom Dark Theme UI), JavaScript (ES6)
+- **Data Visualization**: Chart.js (via CDN)
+- **Local Storage**: Standard CSV & JSON File I/O
+- **Packaging**: PyInstaller (for executable builds)
 
 ---
 
-## File Architecture
+## Project Architecture
 
-* `main.py` - Entry point for the CLI application.
-* `csv_manager.py` - Handles reading, writing, and sorting transaction records.
-* `transactions.py` - Processing logic for balance calculation, categorization, and entry removal.
-* `ui_and_input_handler.py` - Menu interface and command-line input validation.
-* `transactions.csv` - Persistent dataset storage.
+```
+.
+├── app.py                   # Main Flask application and web routing logic
+├── csv_manager.py           # Core logic for CSV read/write, sorting, and analytics aggregation
+├── Ledgr.spec               # PyInstaller build configuration file
+├── static/
+│   ├── script.js            # Frontend modal controls and Chart.js initialization
+│   ├── style.css            # Modern dark-mode styling and responsive layouts
+│   └── analytics.json       # Auto-generated runtime summary data
+├── templates/
+│   ├── index.html           # Main financial overview dashboard
+│   ├── transactions.html    # Manage and filter transaction history
+│   └── analytics.html       # Chart.js visualization page
+└── transactions.csv         # Main user transaction dataset (auto-generated on runtime)
+```
 
 ---
 
 ## Getting Started
 
-### Prerequisites
+### Option 1: Running the Executable (Recommended for End Users)
 
-Ensure Python 3.x is installed on your environment.
+1. Download the latest `Ledgr.exe` from the **[Releases](https://github.com/YOUR_USERNAME/YOUR_REPO_NAME/releases)** section.
+2. Run `Ledgr.exe`.
+3. Your default web browser will automatically launch `http://127.0.0.1:5000/`.
+4. All data files (`transactions.csv`, `filtered_transactions.csv`, `static/analytics.json`) will be generated automatically in the directory where `Ledgr.exe` is located.
 
-### Installation
+---
 
-1. Clone the repository or download the project files.
-2. Install the required dependency:
+### Option 2: Running from Source (For Developers)
 
-```bash
-pip install tabulate
-```
+#### Prerequisites
+- **Python 3.8+** installed on your machine.
 
-### Running the Application
-```bash
-python main.py
-```
+#### Installation & Setup
 
-### Usage Guide
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+   cd YOUR_REPO_NAME
+   ```
 
-1. Add Transaction: Prompts for required fields, validates input formats, assigns an ID, and appends the entry to `transactions.csv`.
+2. **Install dependencies:**
+   ```bash
+   pip install flask
+   ```
 
-2. Delete Transaction: Displays existing entries in tabular format and removes the specified ID while updating subsequent record indexes.
+3. **Run the Flask application:**
+   ```bash
+   python app.py
+   ```
 
-3. View Transactions: Outputs all logged transactions in an organized, readable table.
+4. **Access the application:**
+   Open your browser and navigate to `http://127.0.0.1:5000/`.
 
-4. View Balance: Displays total income, total expenses, and remaining net balance.
+---
 
-5. Spending Summary: Summarizes expenses dynamically grouped by custom category names.
+## Building the Executable with PyInstaller
 
-6. Exit: Safely closes the CLI application interface.
+To bundle the application into a single `.exe` file using PyInstaller:
+
+1. **Install PyInstaller:**
+   ```bash
+   pip install pyinstaller
+   ```
+
+2. **Build using the specification file:**
+   ```bash
+   pyinstaller Ledgr.spec
+   ```
+
+3. Find the generated `Ledgr.exe` inside the newly created `dist/` folder.
+
+---
+
+## Usage Guide
+
+- **Dashboard**: Get an instant breakdown of net balance, total income, total expenses, and the 5 most recent transactions.
+- **Add Transaction**: Click **+ Add Transaction** in the sidebar to record a new entry with type, date, category, expense classification, and description.
+- **Edit / Delete**: Head to the **Transactions** page to filter entries, edit details, or delete unwanted records.
+- **Analytics**: Visit the **Analytics** tab to view graphical charts illustrating where your money goes.
+
+---
+
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
