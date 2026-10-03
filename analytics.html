@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Analytics - Ledgr</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <nav class="sidebar">
+    <div class="brand">Ledgr<span>.</span></div>
+    <ul class="nav-links">
+      <li><a href="{{ url_for('dashboard') }}" class="">Dashboard</a></li>
+      <li><a href="{{ url_for('transaction_page') }}" class="">Transactions</a></li>
+      <li><a href="{{ url_for('analytics') }}" class="active">Analytics</a></li>
+    </ul>
+    <div class="sidebar-action">
+      <button class="btn btn-primary" onclick="window.openTransactionModal()">+ Add Transaction</button>
+    </div>
+  </nav>
+
+  <main class="main-content">
+  <header class="page-header">
+    <h1 class="page-title">Analytics</h1>
+    <p class="page-subtitle">Deep dive into your financial habits.</p>
+  </header>
+
+  {% if transactions %}
+    <section class="grid grid-2">
+      <div class="card">
+        <h2 class="card-title" style="margin-bottom:16px">Top Spending Categories</h2>
+        <div style="height: 300px;">
+          <canvas id="barChart"></canvas>
+        </div>
+      </div>
+      <div class="card">
+        <h2 class="card-title" style="margin-bottom:16px">Expense Breakdown</h2>
+        <div style="height: 300px;">
+          <canvas id="donutChart"></canvas>
+        </div>
+      </div>
+    </section>
+  {% else %}
+    <div class="card" style="text-align: center; padding: 64px 16px; color: var(--text-muted);">
+      <p style="font-size: 1.1rem; font-weight: 500;">No transactions available</p>
+      <p style="font-size: 0.85rem; margin-top: 4px;">Analytics charts will automatically generate once you add transactions.</p>
+    </div>
+  {% endif %}
+</main>
+
+  <div class="modal-overlay" id="transactionModal">
+    <div class="modal">
+      <h2 class="modal-title">Add Transaction</h2>
+      <form id="transactionForm" onsubmit="window.closeTransactionModal()" method="POST">
+        <div class="form-group">
+          <label class="form-label">Type</label>
+          <select class="form-control" name="transaction_type" id="transactionType" onchange="toggleExpenseType()">
+            <option value="Expense">Expense</option>
+            <option value="Income">Income</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Amount</label>
+          <input type="number" step="0.01" class="form-control" placeholder="0.00" name="transaction_amount" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <input type="text" class="form-control" placeholder="e.g. Food" name="transaction_category">
+        </div>
+        <div class="form-group" id="expenseTypeGroup">
+          <label class="form-label">Expense Type</label>
+          <select class="form-control" name="transaction_expense_type">
+            <option value="Needs">Needs</option>
+            <option value="Wants">Wants</option>
+            <option value="Savings">Savings</option>
+            <option value="Investment">Investment</option>
+            <option value="Emergency">Emergency</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Date</label>
+          <input type="date" class="form-control" name="transaction_date" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <input type="text" class="form-control" placeholder="e.g. Weekly groceries" name="transaction_description">
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-secondary" onclick="window.closeTransactionModal()">Cancel</button>
+          <button type="submit" class="btn btn-primary" name="action" value="save_transaction">Save Transaction</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
