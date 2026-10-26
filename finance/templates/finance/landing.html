@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{title}}</title>
+</head>
+<body>
+    <h1>{{title}}</h1>
+    <ul>{% for transaction in transactions %}
+        <li>{{transaction.date}} - {{transaction.description}} - {{transaction.amount}}</li>
+        {% endfor %}
+    </ul>
+    <p>Your local finance tracker.</p>
+    <p><a href="/ping/">Ping the server</a></p>
+</body>
+</html>
