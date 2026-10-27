@@ -8,5 +8,4 @@ urlpatterns = [
     path('about/', about),
     path('ping/json/', ping_json),
     path('tx/', transaction_list),
-    path('broken/', nonexistent_view)
 ]

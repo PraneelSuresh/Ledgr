@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'finance',
 ]
 
+AUTH_USER_MODEL = 'finance.User'
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
