@@ -1,11 +1,8 @@
 from django.contrib import admin
-from django.urls import path
-from finance.views import landing, about, ping_json, transaction_list
+from django.urls import include, path
+
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', landing),
-    path('about/', about),
-    path('ping/json/', ping_json),
-    path('tx/', transaction_list),
+    path("admin/", admin.site.urls),
+    path("", include("finance.urls")),
 ]
