@@ -12,7 +12,7 @@ class Account(models.Model):
         BANK = "bank", "Bank"
         CASH = "cash", "Cash"
         CARD = "card", "Card"
-    
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -25,6 +25,7 @@ class Account(models.Model):
         decimal_places=2,
         default=0,
     )
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         constraints = [
@@ -43,6 +44,8 @@ class Category(models.Model):
     name = models.CharField(max_length=100)
 
     class Meta:
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
         constraints = [
             models.UniqueConstraint(
                 fields=["user", "name"],
@@ -75,6 +78,7 @@ class Transaction(models.Model):
     date = models.DateField()
     description = models.CharField(max_length=200, blank=True, default="")
     created_at = models.DateTimeField(default=timezone.now, editable=False)
+    last_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.date} {self.description[:30]} {self.amount}"
+        return f"{self.date} {self.description[:30]} {self.amount} {self.category}"
