@@ -19,7 +19,7 @@ def add_transaction(request):
         form = TransactionForm(request.POST)
         if form.is_valid():
             transaction = form.save(commit=False)
-            transaction.user = User.objects.get(username="demo")
+            transaction.user, _ = User.objects.get_or_create(username="demo", defaults={"email" : "demo@ledgr.local"})
             transaction.save()
             return redirect("finance:transaction_list")
     else:

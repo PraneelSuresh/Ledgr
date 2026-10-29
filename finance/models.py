@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
-
+from django.core.exceptions import ValidationError
 
 class User(AbstractUser):
     pass
@@ -79,6 +79,35 @@ class Transaction(models.Model):
     description = models.CharField(max_length=200, blank=True, default="")
     created_at = models.DateTimeField(default=timezone.now, editable=False)
     last_modified = models.DateTimeField(auto_now=True)
+
+    def clean(self):
+        super().clean()
+        if self.kind == "expense" and not self.bucket:
+            raise ValidationError({"bucket": "Bucket is required for expenses."})
+        if self.kind == "income" and self.bucket:
+            raise ValidationError({"bucket" : "Bucket must be empty for income"})
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super().save(*args, **kwargs)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=(
+                    models.Q(kind="income", bucket__isnull=True) |
+                    models.Q(kind="expense", bucket__isnull=False)
+                ),
+                name="bucket_must_match_kind"
+            ),
+            models.CheckConstraint(
+                check=(
+                    models.Q(amount__gt=0)
+                ),
+                name="amount_must_be_positive"
+            )
+        ]
+
 
     def __str__(self):
         return f"{self.date} {self.description[:30]} {self.amount} {self.category}"
