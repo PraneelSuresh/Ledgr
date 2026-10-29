@@ -26,15 +26,16 @@ class TransactionForm(forms.ModelForm):
 
 
 class CategoryForm(forms.ModelForm):
-    model = Category
-    fields = ["name"]
+    class Meta:
+        model = Category
+        fields = ["name"]
 
     def clean_name(self):
         name = self.cleaned_data["name"]
         user = User.objects.get(username="demo")
         qs = Category.objects.filter(name=name, user=user)
         if self.instance.pk:
-            qs.exclude(pk=self.instance)
+            qs = qs.exclude(pk=self.instance.pk)
         if qs.exists():
             raise forms.ValidationError(f"You already have a category named {name}")
         return name

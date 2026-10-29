@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from finance.models import Transaction, User
-from finance.forms import TransactionForm
+from finance.forms import TransactionForm, CategoryForm
 
 def about(request):
     return render(request, "finance/about.html")
@@ -26,3 +26,14 @@ def add_transaction(request):
         form = TransactionForm()
     return render(request, "finance/transaction_form.html", {"form" : form})
 
+def add_category(request):
+    if request.method == 'POST':
+        form = CategoryForm(request.POST)
+        if form.is_valid():
+            category = form.save(commit=False)
+            category.user, _ = User.objects.get_or_create(username="demo", defaults={"email": "demo@ledgr.local"})
+            category.save()
+            return redirect("finance:transaction_list")
+    else:
+        form = CategoryForm()
+    return render(request, "finance/category_form.html", {"form" : form})
