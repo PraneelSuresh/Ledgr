@@ -36,7 +36,7 @@ class Account(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.name} {self.get_kind_display()}"
+        return f"{self.get_kind_display()} - {self.name}"
 
 
 class Category(models.Model):
@@ -72,13 +72,14 @@ class Transaction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="transactions")
     account = models.ForeignKey(Account, on_delete=models.PROTECT, related_name="transactions")
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="transactions")
-    kind = models.CharField(max_length=10, choices=Kind.choices)
+    kind = models.CharField(max_length=10, choices=Kind.choices, default="Income")
     bucket = models.CharField(max_length=10, choices=Bucket.choices, null=True, blank=True)
     amount = models.DecimalField(max_digits=12, decimal_places=2)
     date = models.DateField()
     description = models.CharField(max_length=200, blank=True, default="")
     created_at = models.DateTimeField(default=timezone.now, editable=False)
     last_modified = models.DateTimeField(auto_now=True)
+
 
     def clean(self):
         super().clean()
@@ -107,7 +108,6 @@ class Transaction(models.Model):
                 name="amount_must_be_positive"
             )
         ]
-
 
     def __str__(self):
         return f"{self.date} {self.description[:30]} {self.amount} {self.category}"

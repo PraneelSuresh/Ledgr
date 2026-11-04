@@ -10,7 +10,9 @@ class Command(BaseCommand):
     help = "Seed the database with demo data for Ledgr."
 
     def handle(self, *args, **options):
+        # Set seed so that the data does not change upon rerun
         random.seed(42)
+        # Creates user if does not exist
         user, created = User.objects.get_or_create(
             username='demo',
             defaults={'email': 'demo@ledgr.local', 'is_staff': True, 'is_superuser': True}
@@ -21,6 +23,8 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS("Created user 'demo' (password : 'demo')"))
         else:
             self.stdout.write(self.style.NOTICE("User 'demo' already exists. Use username: 'demo', password: 'demo' to log in"))
+
+        # Creates account for user based on the data in accounts_data if it does not already exist
 
         accounts_data = [
             {"name": "HDFC Savings", "kind": "bank", "opening_balance": Decimal("50000")},
@@ -39,6 +43,8 @@ class Command(BaseCommand):
             )
             accounts.append(account)
             self.stdout.write(f"Account: {account.name}")
+
+        # Creates categories for user based on the data in category_names if it does not already exist
 
         category_names = ["Food", "Transport", "Rent", "Utilities", "Entertainment", "Salary"]
 

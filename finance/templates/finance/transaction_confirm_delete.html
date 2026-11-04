@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction Confirm Delete</title>
+</head>
+
+<body>
+    <h1>Delete Transaction?</h1>
+    <p>Are you sure you want to delete "{{ transaction.description }}"?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Yes, delete</button>
+        <a href="{% url 'finance:transaction_list' %}">Cancel</a>
+    </form>
+</body>
+
+</html>

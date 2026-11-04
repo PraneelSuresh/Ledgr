@@ -1,15 +1,244 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Category Form</title>
-</head>
-<body>
-    <form method="POST">
-        {% csrf_token %}
-        {{form.as_p}}
-        <button type="submit">Save</button>
-    </form>
-</body>
-</html>
+{% extends "finance/base.html" %}
+
+{% block title %}Categories — Ledgr{% endblock %}
+{% block body_class %}bg-canvas{% endblock %}
+
+{% block content %}
+<div class="app-layout">
+
+    <!-- Left Rail -->
+    <aside class="sidebar reveal d1">
+        <div class="sidebar-brand">
+            <span class="brand-text">Ledgr.</span>
+            <span class="brand-icon">L.</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{% url 'finance:transaction_list' %}" class="nav-item" title="Transactions">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+                <span class="nav-text">Transactions</span>
+            </a>
+            <a href="#" class="nav-item" title="Dashboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                <span class="nav-text">Dashboard</span>
+            </a>
+            <a href="{% url 'finance:category_list' %}" class="nav-item active" title="Categories">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                    <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                </svg>
+                <span class="nav-text">Categories</span>
+            </a>
+            <a href="{% url 'finance:accounts_list' %}" class="nav-item" title="Accounts">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+                    <line x1="2" y1="10" x2="22" y2="10"></line>
+                </svg>
+                <span class="nav-text">Accounts</span>
+            </a>
+        </nav>
+
+        <!-- Logout -->
+        <div class="sidebar-footer">
+            <form id="logout-form" action="{% url 'finance:logout_user' %}" method="post" style="display: none;">
+                {% csrf_token %}
+            </form>
+            <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+                class="nav-item logout-item" title="Log out">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                </svg>
+                <span class="nav-text">Log out</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="content-wrapper">
+
+            <header class="page-header reveal d2">
+                <div>
+                    <h1 class="page-title">Categories</h1>
+                    <p class="page-subtitle">Organize your spending into buckets.</p>
+                </div>
+
+                <div class="header-actions">
+                    <!-- Triggers modal in "Add" mode -->
+                    <button type="button" class="btn-primary" onclick="openCategoryModal('add')">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M5 12h14" />
+                            <path d="M12 5v14" />
+                        </svg>
+                        <span>Add category</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Table Container -->
+            <div class="table-container reveal d3">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th class="w-actions text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in categories %}
+                        <tr>
+                            <td class="font-medium">{{ category.name }}</td>
+                            <td class="text-right">
+                                <div class="row-actions">
+                                    <!-- Edit Button -->
+
+                                        <button class="btn-icon" aria-label="Edit"
+                                            onclick="openCategoryModal('edit', '{{ category.pk }}', '{{ category.name }}')">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                                            </svg>
+                                        </button>
+
+                                    <!-- Delete Button (Assuming you handle delete via POST or a URL) -->
+                                    <form method="POST" action="{% url 'finance:delete_category' category.pk %}"
+                                        style="display: inline;">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn-icon btn-icon-danger" aria-label="Delete">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2">
+                                                <path d="M3 6h18" />
+                                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                                            </svg>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2" class="text-center text-muted" style="padding: 3rem 1.5rem;">
+                                No categories found. Create one to get started.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </main>
+</div>
+
+<!-- Category Modal -->
+<dialog id="category-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modal-title">Add Category</h2>
+            <button type="button" class="btn-icon" onclick="document.getElementById('category-modal').close()"
+                aria-label="Close">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 6 6 18" />
+                    <path d="m6 6 12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Form action needs to be set by JS or template tags -->
+        <form method="POST" id="category-form" class="modal-form" action="{% url 'finance:add_category' %}" novalidate>
+            {% csrf_token %}
+
+            <div class="field">
+
+                <div class="field">
+                    <label class="label">Name</label>
+                    {{ form.name }}
+                    <!-- Add this block to display errors -->
+                    {% if form.name.errors %}
+                    {% for error in form.name.errors %}
+                    <p class="error">{{ error }}</p>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+                <!-- If you have a form passed in context, you'd use {{ form.name }} here -->
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary"
+                    onclick="document.getElementById('category-modal').close()">Cancel</button>
+                <button type="submit" class="btn-primary" style="width: auto; padding: 0 2rem;">Save</button>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // 1. Handle clicking outside the modal to close it
+        const modal = document.getElementById('category-modal');
+        if (modal) {
+            modal.addEventListener('click', function (e) {
+                if (e.target === this) this.close();
+            });
+        }
+
+        // 2. Auto-open the modal if Django says there was an error
+        // We use the |yesno filter to convert Python True/False to JS true/false
+        const shouldOpen = "{{ open_modal|yesno:'true,false' }}";
+
+        if (shouldOpen === "true") {
+            if (modal && !modal.open) {
+                modal.showModal();
+            }
+        }
+    });
+
+    function openCategoryModal(mode, id = '', name = '') {
+        const modal = document.getElementById('category-modal');
+        const form = document.getElementById('category-form');
+        const title = document.getElementById('modal-title');
+        const nameInput = document.querySelector('#category-form input[name="name"]');
+
+        if (!modal || !form || !title) return;
+
+        if (modal.open) {
+            modal.close();
+        }
+
+        if (mode === 'edit') {
+            title.textContent = 'Edit Category';
+            if (nameInput) nameInput.value = name;
+            const baseUrl = "{% url 'finance:edit_category' 0 %}"
+            form.action = baseUrl.replace("0", id);
+        } else {
+            title.textContent = 'Add Category';
+            if (nameInput) nameInput.value = '';
+            form.action = "{% url 'finance:add_category' %}";
+        }
+
+        modal.showModal();
+    }
+</script>
+{% endblock %}

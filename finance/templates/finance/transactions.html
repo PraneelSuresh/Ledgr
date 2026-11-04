@@ -1,268 +1,191 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transactions</title>
+{% extends "finance/base.html" %}
 
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+{% block title %}Transactions — Ledgr{% endblock %}
+{% block body_class %}bg-canvas{% endblock %}
 
-        body {
-            font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: #0d0f12;
-            color: #e8eaed;
-            min-height: 100vh;
-        }
+{% block content %}
+<div class="app-layout">
 
-        .container {
-            width: min(1200px, 92%);
-            margin: 0 auto;
-            padding: 40px 0;
-        }
+  <!-- Left Rail -->
+  <aside class="sidebar reveal d1">
+    <div class="sidebar-brand">
+      <span class="brand-text">Ledgr.</span>
+      <span class="brand-icon">L.</span>
+    </div>
 
-        /* Header */
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 28px;
-        }
+    <nav class="sidebar-nav">
+      <a href="{% url 'finance:transaction_list' %}" class="nav-item active" title="Transactions">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        <span class="nav-text">Transactions</span>
+      </a>
+      <a href="#" class="nav-item" title="Dashboard">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        <span class="nav-text">Dashboard</span>
+      </a>
+      <a href="{% url 'finance:category_list' %}" class="nav-item" title="Categories">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+          <line x1="7" y1="7" x2="7.01" y2="7"></line>
+        </svg>
+        <span class="nav-text">Categories</span>
+      </a>
+    </nav>
+    <a href="{% url 'finance:accounts_list' %}" class="nav-item" title="Accounts">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+        <line x1="2" y1="10" x2="22" y2="10"></line>
+      </svg>
+      <span class="nav-text">Accounts</span>
+    </a>
+    <!-- Logout Button -->
+    <div class="sidebar-footer">
+      <form id="logout-form" action="{% url 'finance:logout_user' %}" method="post" style="display: none;">
+        {% csrf_token %}
+      </form>
+      <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();"
+        class="nav-item logout-item" title="Log out">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        <span class="nav-text">Log out</span>
+      </a>
+    </div>
+  </aside>
 
-        .header h1 {
-            font-size: 28px;
-            font-weight: 600;
-            letter-spacing: -0.5px;
-        }
+  <!-- Main Content -->
+  <main class="main-content">
 
-        .header p {
-            color: #8b919a;
-            margin-top: 5px;
-            font-size: 14px;
-        }
+    <div class="content-wrapper">
+      <!-- Header & Actions -->
+      <header class="page-header reveal d2">
+        <div>
+          <h1 class="page-title">Transactions</h1>
+          <p class="page-subtitle">Your ledger, itemized and accountable.</p>
+        </div>
 
-        /* Card */
-        .card {
-            background: #15181d;
-            border: 1px solid #242830;
-            border-radius: 14px;
-            overflow: hidden;
-        }
+        <div class="header-actions">
+          <form method="get" class="search-box">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <path d="m21 21-4.3-4.3" />
+            </svg>
+            <input type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Search transactions..." />
+          </form>
 
-        /* Toolbar */
-        .toolbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 16px;
-            padding: 18px 20px;
-            border-bottom: 1px solid #242830;
-        }
+          <a class="btn-primary" href="{% url 'finance:add_transaction' %}">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14" />
+              <path d="M12 5v14" />
+            </svg>
+            <span>Add</span>
+          </a>
+        </div>
+      </header>
 
-        .search {
-            background: #0d0f12;
-            border: 1px solid #2a2e36;
-            color: #e8eaed;
-            padding: 10px 13px;
-            border-radius: 8px;
-            outline: none;
-            width: 260px;
-            font-size: 14px;
-        }
+      <!-- Filters -->
+      <div class="filter-bar reveal d3">
+        <form method="get" class="filter-group">
+          <!--{% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
 
-        .search:focus {
-            border-color: #555c68;
-        }
+          <select name="type" class="filter-select" onchange="this.form.submit()">
+            <option value="all">All Types</option>
+            <option value="income">Income</option>
+            <option value="expense">Expenses</option>
+          </select>-->
 
-        .filter {
-            background: #1b1f25;
-            border: 1px solid #2a2e36;
-            color: #dfe2e6;
-            padding: 10px 13px;
-            border-radius: 8px;
-            font-size: 14px;
-            outline: none;
-        }
+          <form method="GET">
+            {{ kind_filter.form }}
+            <button class="btn-primary" type="submit">Filter</button>
+          </form>
 
-        /* Table */
-        .table-wrapper {
-            overflow-x: auto;
-        }
+          <select name="date" class="filter-select" onchange="this.form.submit()">
+            <option value="all">All Time</option>
+            <option value="this-month">This Month</option>
+            <option value="last-month">Last Month</option>
+          </select>
+        </form>
+      </div>
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+      <!-- Table Container -->
+      <div class="table-container reveal d4">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="w-date">Date</th>
+              <th>Account</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Category</th>
+              <th>Bucket</th>
+              <th class="w-amount text-right">Amount</th>
+              <th class="w-actions text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for transaction in transactions %}
+            <tr>
+              <td class="text-muted">{{ transaction.date|date:"M d, Y" }}</td>
+              <td>{{ transaction.account.name }}</td>
+              <td>{{ transaction.kind.capitalize }}</td>
+              <td class="font-medium">{{ transaction.description }}</td>
+              <td><span class="tag">{{ transaction.category }}</span></td>
+              <td class="text-muted">{{ transaction.bucket.capitalize }}</td>
 
-        th {
-            text-align: left;
-            font-size: 12px;
-            font-weight: 500;
-            color: #7f8691;
-            text-transform: uppercase;
-            letter-spacing: 0.6px;
-            padding: 14px 20px;
-            background: #12151a;
-        }
+              <td class="text-right {% if transaction.type == 'income' %}text-lime{% endif %}">
+                {% if transaction.kind == 'income' %}{% else %}-{% endif %} ${{ transaction.amount|floatformat:2 }}
+              </td>
 
-        td {
-            padding: 17px 20px;
-            border-top: 1px solid #22262d;
-            font-size: 14px;
-            color: #d9dce1;
-        }
+              <td class="text-right">
+                <div class="row-actions">
+                  <a href="{% url 'finance:edit_transaction' transaction.id %}" class="btn-icon" aria-label="Edit">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z" />
+                    </svg>
+                  </a>
+                  <a href="{% url 'finance:delete_transaction' transaction.id %}" class="btn-icon btn-icon-danger"
+                    aria-label="Delete">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3 6h18" />
+                      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+                      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                    </svg>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="8" class="text-center text-muted" style="padding: 3rem 1.5rem;">
+                No transactions found.
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
 
-        tbody tr {
-            transition: background 0.15s ease;
-        }
-
-        tbody tr:hover {
-            background: #1a1e24;
-        }
-
-        /* Amounts */
-        .amount {
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        .income {
-            color: #7dd3a8;
-        }
-
-        .expense {
-            color: #e88989;
-        }
-
-        /* Category badge */
-        .category {
-            display: inline-block;
-            padding: 5px 9px;
-            border-radius: 6px;
-            background: #20242b;
-            color: #aeb4bd;
-            font-size: 12px;
-        }
-
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 70px 20px;
-            color: #737a85;
-        }
-
-        .empty-state h2 {
-            color: #aeb4bd;
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 6px;
-        }
-
-        .empty-state p {
-            font-size: 14px;
-        }
-
-        /* Responsive */
-        @media (max-width: 700px) {
-            .container {
-                width: 95%;
-                padding: 24px 0;
-            }
-
-            .header {
-                align-items: flex-start;
-            }
-
-            .toolbar {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .search {
-                width: 100%;
-            }
-
-            th,
-            td {
-                padding: 13px 14px;
-            }
-        }
-    </style>
-</head>
-
-<body>
-
-    <main class="container">
-
-        <header class="header">
-            <div>
-                <h1>Transactions</h1>
-                <p>View and manage your transactions</p>
-            </div>
-        </header>
-
-        <section class="card">
-
-            <div class="toolbar">
-
-                <input
-                    type="text"
-                    class="search"
-                    placeholder="Search transactions..."
-                >
-
-                <select class="filter">
-                    <option>All transactions</option>
-                    <!-- Add your filters here -->
-                </select>
-
-            </div>
-
-            <div class="table-wrapper">
-
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Description</th>
-                            <th>Category</th>
-                            <th>Transaction Medium</th>
-                            <th>Account</th>
-                            <th>Type</th>
-                            <th>Bucket</th>
-                            <th>Amount</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                            {% for transaction in transactions %}
-                            <tr>
-                                <td>{{ transaction.date | date:'Y-m-d' }}</td>
-                                <td>{{ transaction.description }}</td>
-                                <td>
-                                    <span class="category">
-                                        {{ transaction.category }}
-                                    </span>
-                                </td>
-                                <td>{{ transaction.account.get_kind_display }}</td>
-                                <td>{{ transaction.account.name }}</td>
-                                <td>{{ transaction.get_kind_display }}</td>
-                                <td>{{ transaction.get_bucket_display|default:"N/A" }}</td>
-                                <td class="amount">{{ transaction.amount|floatformat:2 }}</td>
-                            </tr>
-                            {% endfor %}
-                    </tbody>
-                </table>
-
-            </div>
-
-        </section>
-
-    </main>
-
-</body>
-</html>
+    </div>
+  </main>
+</div>
+{% endblock %}

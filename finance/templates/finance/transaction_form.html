@@ -1,18 +1,146 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "finance/base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Transaction Form</title>
-</head>
+{% block title %}Edit Transaction — Ledgr{% endblock %}
 
-<body>
-    <form method="post">
-        {% csrf_token %}
-        {{form.as_p}}
-        <button type="submit">Save</button>
+{% block content %}
+<main class="shell" style="align-items: flex-start; padding-top: 6rem;">
+  <div class="card">
+
+    <!-- Page Header with Load Animation -->
+    <div class="form-animate row-delay-1" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem;">
+      <h1 class="h1">
+        {% if is_edit %}Edit {% else %}Add {% endif %}<span class="accent">Transaction</span>
+      </h1>
+
+      <a href="{% url 'finance:transaction_list' %}" class="btn-secondary" style="height: 36px; padding: 0 1rem; font-size: 13px; text-decoration: none;">
+        Cancel
+      </a>
+    </div>
+
+    <form method="POST" class="stack" style="margin-top: 0;">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="error-box form-animate row-delay-1">{{ form.non_field_errors|join:" " }}</div>
+      {% endif %}
+
+      <!-- Row 1: Date & Type -->
+      <div class="form-row form-animate row-delay-2">
+        <div class="field">
+          <label class="label">Date</label>
+          {{ form.date }}
+          {% for error in form.date.errors %}<p class="error">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="field">
+          <label class="label">Type</label>
+          {{ form.kind }}
+          {% for error in form.kind.errors %}<p class="error">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+
+      <!-- Row 2: Account & Amount -->
+      <div class="form-row form-animate row-delay-3">
+        <div class="field">
+          <label class="label">Account</label>
+          {{ form.account }}
+          {% for error in form.account.errors %}<p class="error">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="field">
+          <label class="label">Amount</label>
+          <div class="input-with-symbol">
+            <span class="currency-symbol">$</span>
+            {{ form.amount }}
+          </div>
+          {% for error in form.amount.errors %}<p class="error">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+
+      <!-- Row 3: Description -->
+      <div class="field form-animate row-delay-4">
+        <label class="label">Description</label>
+        {{ form.description }}
+        {% for error in form.description.errors %}<p class="error">{{ error }}</p>{% endfor %}
+      </div>
+
+      <!-- Row 4: Category & Bucket (with ID for JS) -->
+      <div class="form-row form-animate row-delay-5" id="category-bucket-row">
+        <div class="field">
+          <label class="label">Category</label>
+          {{ form.category }}
+          {% for error in form.category.errors %}<p class="error">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="field" id="bucket-wrapper">
+          <label class="label">Bucket</label>
+          {{ form.bucket }}
+          {% for error in form.bucket.errors %}<p class="error">{{ error }}</p>{% endfor %}
+        </div>
+      </div>
+
+      <!-- Submit Button with Load Animation -->
+      <div class="form-animate row-delay-5" style="margin-top: 1rem;">
+        <button type="submit" class="btn-primary">
+          Save Transaction
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+          </svg>
+        </button>
+      </div>
     </form>
-</body>
 
-</html>
+  </div>
+</main>
+
+<!-- Smooth Hide/Show Script -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const typeInput = document.getElementById('id_kind');
+    const bucketWrapper = document.getElementById('bucket-wrapper');
+    const formRow = document.getElementById('category-bucket-row');
+
+    if (typeInput && bucketWrapper && formRow) {
+
+      function toggleBucket() {
+        const isIncome = typeInput.value === 'income';
+
+        if (isIncome) {
+          // 1. Start the fade out animation
+          bucketWrapper.classList.add('hiding');
+
+          // 2. Change the grid immediately so the Category expands smoothly
+          formRow.style.gridTemplateColumns = '1fr';
+
+          // 3. After the animation finishes (250ms), set display to none
+          setTimeout(() => {
+            bucketWrapper.style.display = 'none';
+          }, 250);
+
+          // Clear the value
+          const bucketSelect = document.getElementById('id_bucket');
+          if (bucketSelect) bucketSelect.value = '';
+
+        } else {
+          // 1. Make it a block element again so it can be animated
+          bucketWrapper.style.display = 'flex';
+
+          // 2. Wait a tiny fraction of a second for the browser to register the display change, then fade in
+          setTimeout(() => {
+            bucketWrapper.classList.remove('hiding');
+          }, 10);
+
+          // 3. Reset the grid
+          formRow.style.gridTemplateColumns = '1fr 1fr';
+        }
+      }
+
+      // Run on load (in case it's already income)
+      toggleBucket();
+
+      // Run on change
+      typeInput.addEventListener('change', toggleBucket);
+    }
+  });
+</script>
+{% endblock %}
