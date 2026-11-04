@@ -105,25 +105,14 @@
 
       <!-- Filters -->
       <div class="filter-bar reveal d3">
-        <form method="get" class="filter-group">
-          <!--{% if request.GET.q %}<input type="hidden" name="q" value="{{ request.GET.q }}">{% endif %}
+        <form method="GET" class="filter-group">
+          <!-- Render the filter fields directly -->
+          {{ kind_filter.form }}
+          {{ time_filter.form }}
 
-          <select name="type" class="filter-select" onchange="this.form.submit()">
-            <option value="all">All Types</option>
-            <option value="income">Income</option>
-            <option value="expense">Expenses</option>
-          </select>-->
-
-          <form method="GET">
-            {{ kind_filter.form }}
-            <button class="btn-primary" type="submit">Filter</button>
-          </form>
-
-          <select name="date" class="filter-select" onchange="this.form.submit()">
-            <option value="all">All Time</option>
-            <option value="this-month">This Month</option>
-            <option value="last-month">Last Month</option>
-          </select>
+          <button class="btn-primary" type="submit" style="height: 36px; padding: 0 1rem; font-size: 14px; width: auto;">
+            Filter
+          </button>
         </form>
       </div>
 

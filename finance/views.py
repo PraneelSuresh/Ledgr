@@ -5,7 +5,7 @@ from finance.forms import TransactionForm, CategoryForm, CustomUserCreationForm,
 from django.contrib import messages
 from django.contrib.auth import login, logout as django_logout
 from django.contrib.auth.decorators import login_required
-from finance.filters import KindFilter
+from finance.filters import KindFilter, TimeFilter
 
 def about(request):
     return render(request, "finance/about.html")
@@ -18,7 +18,9 @@ def transaction_list(request):
     transactions = Transaction.objects.filter(user=request.user).select_related('category', 'account').order_by("-date", "-created_at")
     kind_filter = KindFilter(request.GET, queryset=transactions)
     transactions = kind_filter.qs
-    context = {"transactions" : transactions, "kind_filter" : kind_filter}
+    time_filter = TimeFilter(request.GET, queryset=transactions)
+    transactions = time_filter.qs
+    context = {"transactions" : transactions, "time_filter" : time_filter, "kind_filter": kind_filter}
     return render(request, "finance/transactions.html", context)
 
 @login_required
