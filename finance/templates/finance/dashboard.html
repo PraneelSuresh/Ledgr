@@ -1,0 +1,212 @@
+{% extends "finance/base.html" %}
+
+{% block title %}Dashboard — Ledgr{% endblock %}
+{% block body_class %}bg-canvas{% endblock %}
+
+{% block content %}
+<div class="app-layout">
+
+  <!-- Left Rail -->
+  <aside class="sidebar reveal d1">
+    <div class="sidebar-brand">
+      <span class="brand-text">Ledgr.</span>
+      <span class="brand-icon">L.</span>
+    </div>
+
+    <nav class="sidebar-nav">
+      <a href="{% url 'finance:transaction_list' %}" class="nav-item" title="Transactions">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+        <span class="nav-text">Transactions</span>
+      </a>
+      <a href="{% url 'finance:view_dashboard' %}" class="nav-item active" title="Dashboard">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+        <span class="nav-text">Dashboard</span>
+      </a>
+      <a href="{% url 'finance:category_list' %}" class="nav-item" title="Categories">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line>
+        </svg>
+        <span class="nav-text">Categories</span>
+      </a>
+      <a href="{% url 'finance:accounts_list' %}" class="nav-item" title="Accounts">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="2"></rect><line x1="2" y1="10" x2="22" y2="10"></line>
+        </svg>
+        <span class="nav-text">Accounts</span>
+      </a>
+    </nav>
+
+    <!-- Logout -->
+    <div class="sidebar-footer">
+      <form id="logout-form" action="{% url 'finance:logout_user' %}" method="post" style="display: none;">
+        {% csrf_token %}
+      </form>
+      <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="nav-item logout-item" title="Log out">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        <span class="nav-text">Log out</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="content-wrapper">
+
+      <header class="page-header reveal d2">
+        <div>
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-subtitle">A bird's-eye view of your finances.</p>
+        </div>
+      </header>
+
+      <!-- ROW 1: STAT CARDS -->
+      <div class="dashboard-stats reveal d3">
+        <div class="stat-card-large">
+          <span class="stat-label">Monthly Income</span>
+          <span class="stat-value text-lime">${{ income|floatformat:2 }}</span>
+        </div>
+
+        <div class="stat-card-large">
+          <span class="stat-label">Monthly Expense</span>
+          <span class="stat-value text-orange">-${{ expense|floatformat:2 }}</span>
+        </div>
+
+        <div class="stat-card-large">
+          <span class="stat-label">Balance</span>
+          <span class="stat-value {% if balance >= 0 %}text-lime{% else %}text-orange{% endif %}">
+            ${{ net|floatformat:2 }}
+          </span>
+        </div>
+      </div>
+
+      <!-- ROW 2 & 3: CHARTS GRID -->
+      <div class="dashboard-charts-grid reveal d4">
+
+        <!-- Income vs Expense (Full Width) -->
+        <div class="chart-card full-width">
+          <h3 class="chart-title">Income vs Expense</h3>
+          <div class="canvas-wrapper">
+            <canvas id="incomeExpenseChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Expenses by Bucket -->
+        <div class="chart-card">
+          <h3 class="chart-title">Expenses by Bucket</h3>
+          <div class="canvas-wrapper">
+            <canvas id="bucketChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Expenses by Category -->
+        <div class="chart-card">
+          <h3 class="chart-title">Expenses by Category</h3>
+          <div class="canvas-wrapper">
+            <canvas id="categoryChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+</div>
+{{ expenses_grouped_by_bucket|json_script:"expenses_grouped_by_bucket" }}
+{{ expenses_grouped_by_category|json_script:"expenses_grouped_by_category" }}
+{{ six_month_summary|json_script:"six_month_summary" }}
+<!-- Chart.js Library -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    Chart.defaults.color = '#8A8A8A';
+    Chart.defaults.font.family = '"Geist", sans-serif';
+    Chart.defaults.font.weight = '500';
+    Chart.defaults.scale.grid.color = '#1F1F1F';
+
+    const limeColor = '#C6F24E';
+    const orangeColor = '#FF7A45';
+    const inkColor = '#EDEDED';
+    const mutedColor = '#5A5A5A';
+
+
+    const six_month_summary = JSON.parse(document.getElementById('six_month_summary').textContent)
+    const expenses_grouped_by_bucket = JSON.parse(document.getElementById('expenses_grouped_by_bucket').textContent)
+    const expenses_grouped_by_category = JSON.parse(document.getElementById('expenses_grouped_by_category').textContent)
+
+    const months = [...new Set(six_month_summary.map(item => item.month))];
+    const incomeData = months.map(month => {
+        const found = six_month_summary.find(item => item.month === month && item.kind === "income");
+        return found ? found.total : 0;
+    });
+
+    const expenseData = months.map(month => {
+        const found = six_month_summary.find(item => item.month === month && item.kind === "expense");
+        return found ? found.total : 0;
+    })
+
+    // ROW 2 Chart
+    const ctxIncExp = document.getElementById('incomeExpenseChart').getContext('2d');
+    new Chart(ctxIncExp, {
+      type: 'bar',
+      data: {
+        labels: months,
+        datasets: [
+          { label: 'Income', data: incomeData, backgroundColor: limeColor, borderRadius: 4 },
+          { label: 'Expense', data: expenseData, backgroundColor: orangeColor, borderRadius: 4 }
+        ]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { position: 'top', align: 'end' } },
+        scales: { x: { grid: { display: false } }, y: { beginAtZero: true, border: { display: false } } }
+      }
+    });
+
+    // ROW 3A Chart
+        const bucketLabels = expenses_grouped_by_bucket.map(item => {
+        if (!item.bucket) return 'None';
+        return item.bucket.charAt(0).toUpperCase() + item.bucket.slice(1);
+    });
+    const bucketTotals = expenses_grouped_by_bucket.map(item => item.total);
+    new Chart(document.getElementById("bucketChart"), {
+      type: 'bar',
+      data: {
+        labels: bucketLabels,
+        datasets: [{ label: 'Total Expense', data: bucketTotals, backgroundColor: [inkColor, orangeColor, limeColor], borderRadius: 4, barThickness: 24 }]
+      },
+      options: {
+        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { x: { beginAtZero: true, border: { display: false } }, y: { grid: { display: false }, border: { display: false } } }
+      }
+    });
+
+    // ROW 3B Chart
+
+    //const categoryLabels = expenses_grouped_by_category.map(item => {
+    //    if (!item.category__name) return 'None';
+    //    return item.category__name.charAt(0).toUpperCase() + item.bucket.slice(1)
+    //});
+    const categoryLabels = expenses_grouped_by_category.map(item => item.category__name || "Uncategorized");
+    const categoryTotals = expenses_grouped_by_category.map(item => item.total);
+    new Chart(document.getElementById('categoryChart'), {
+      type: 'doughnut',
+      data: {
+        labels: categoryLabels,
+        datasets: [{ data: categoryTotals, backgroundColor: [limeColor, orangeColor, inkColor, mutedColor], borderWidth: 0, hoverOffset: 4 }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, cutout: '70%',
+        plugins: { legend: { position: 'right' } }
+      }
+    });
+  });
+</script>
+{% endblock %}

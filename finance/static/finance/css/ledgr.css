@@ -448,3 +448,141 @@ a { color: inherit; text-decoration: none;}
   align-items: center;
   gap: 0.75rem;
 }
+
+/* ========================================================= */
+/* ---------- DASHBOARD LAYOUT (RESPONSIVE) ---------------- */
+/* ========================================================= */
+
+/* Row 1: Stat Cards */
+.dashboard-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card-large {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.stat-card-large .stat-label {
+  font-size: 13px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+}
+
+.stat-card-large .stat-value {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+/* Rows 2 & 3: Charts Grid */
+.dashboard-charts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+/* On desktop, switch to a 2-column layout */
+@media (min-width: 1024px) {
+  .dashboard-charts-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .dashboard-charts-grid .full-width {
+    grid-column: span 2;
+  }
+}
+
+/* Chart Cards */
+.chart-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-card);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 0 0 1rem 0;
+  color: var(--ink);
+  flex-shrink: 0;
+}
+
+/* Chart Containers */
+.canvas-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 250px; /* Fixed height prevents Chart.js from collapsing */
+}
+
+/* On large screens, we allow the charts to grow a bit taller */
+@media (min-width: 1024px) {
+  .canvas-wrapper {
+    height: 350px;
+  }
+}
+
+/* ========================================================= */
+/* ---------- DESKTOP FIT-TO-SCREEN FIX -------------------- */
+/* ========================================================= */
+
+/* Only apply this behavior on large screens (Desktop) */
+@media (min-width: 1024px) {
+
+  /* 1. Constrain the entire dashboard content wrapper */
+  .content-wrapper {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Prevents scrolling */
+    padding-bottom: 1.5rem; /* Keeps a nice bottom margin */
+  }
+
+  /* 2. Make our new wrapper take up the remaining vertical space */
+  .dashboard-fit-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* Fills space below the header */
+    min-height: 0; /* Crucial for flexbox shrinking */
+    gap: 1.5rem;
+  }
+
+  /* 3. Prevent stat cards from growing or shrinking */
+  .dashboard-stats {
+    flex-shrink: 0;
+  }
+
+  /* 4. Make the charts grid fill the rest of the space */
+  .dashboard-charts-grid {
+    flex: 1;
+    min-height: 0; /* Crucial for flexbox shrinking */
+  }
+
+  /* 5. Make the rows inside the grid shrink appropriately */
+  .chart-card {
+    min-height: 0;
+  }
+  .chart-card.full-width {
+    min-height: 0;
+  }
+
+  /* 6. Remove the fixed pixel heights from the wrappers
+        and let them fill the flex container instead */
+  .canvas-wrapper {
+    height: 100%;
+    min-height: 150px; /* Minimum height so it never disappears */
+  }
+}

@@ -22,7 +22,8 @@ urlpatterns = [
     path("accounts/view/", views.accounts_list, name="accounts_list"),
     path("accounts/new/", views.add_account, name="add_account"),
     path("accounts/<int:pk>/delete/", views.delete_account, name="delete_account"),
-    path("accounts/<int:pk>/edit/", views.edit_account, name="edit_account")
+    path("accounts/<int:pk>/edit/", views.edit_account, name="edit_account"),
+    path("dashboard/", views.view_dashboard, name="view_dashboard")
 ]
 
 if settings.DEBUG:

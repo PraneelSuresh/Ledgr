@@ -6,6 +6,9 @@ from django.contrib import messages
 from django.contrib.auth import login, logout as django_logout
 from django.contrib.auth.decorators import login_required
 from finance.filters import KindFilter, TimeFilter
+import datetime
+from django.db.models import Sum
+from django.db.models.functions import TruncMonth
 
 def about(request):
     return render(request, "finance/about.html")
@@ -167,3 +170,24 @@ def edit_account(request, pk):
         accounts = Account.objects.filter(user=request.user)
         return render(request, "finance/accounts.html", {"form": form, "accounts": accounts, "is_edit": True, "open_modal" : True})
     return redirect("finance:accounts_list")
+@login_required
+def view_dashboard(request):
+    this_month = datetime.date.today().month
+    this_year = datetime.date.today().year
+
+    income = Transaction.objects.filter(user=request.user, kind="income", date__month=this_month, date__year=this_year).aggregate(total=Sum("amount"))
+    total_expense = Transaction.objects.filter(user=request.user, kind="expense", date__month=this_month, date__year=this_year).aggregate(total=Sum("amount"))
+    expenses_grouped_by_bucket = list(Transaction.objects.filter(user=request.user, kind="expense", date__month=this_month, date__year=this_year).values("bucket").annotate(total=Sum("amount")))
+    expenses_grouped_by_category = list(Transaction.objects.filter(user=request.user, kind="expense", date__month=this_month, date__year=this_year).values("category__name").annotate(total=Sum("amount")))
+    six_month_summary = list(Transaction.objects.filter(user=request.user).annotate(month=TruncMonth("date")).values("month", "kind").annotate(total=Sum("amount")).order_by("-month")[:12])
+    for item in six_month_summary:
+        item["month"] = item["month"].strftime("%b %Y")
+
+    if total_expense["total"] == None:
+        total_expense["total"] = 0
+    if income["total"] == None:
+        income["total"] = 0
+
+    net = income["total"] - total_expense["total"]
+
+    return render(request, 'finance/dashboard.html' ,{"income": income["total"], "expense": total_expense["total"], "net": net, "expenses_grouped_by_bucket": expenses_grouped_by_bucket, "expenses_grouped_by_category": expenses_grouped_by_category, "six_month_summary": six_month_summary})
