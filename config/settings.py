@@ -129,3 +129,10 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'finance:login_user'
 SESSION_COOKIE_SECURE = False
+
+DJANGO_BINARY_BUILDER = {
+    "NAME": "Ledgr",
+    "VERSION": "3.0.0",
+    "PUBLISHER": "Praneel Suresh",
+    "EXECUTABLE_NAME": "ledgr",
+}

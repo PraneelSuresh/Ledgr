@@ -1,0 +1,94 @@
+{% extends "finance/base.html" %}
+
+{% block title %}About — Ledgr{% endblock %}
+{% block body_class %}bg-canvas{% endblock %}
+
+{% block content %}
+<main class="shell" style="min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 4rem 2rem;">
+  <div style="max-width: 640px; width: 100%; text-align: center;">
+
+    <!-- Headline -->
+    <h1 class="reveal d1" style="font-size: clamp(40px, 6vw, 56px); line-height: 1.05; letter-spacing: -0.04em; font-weight: 700; margin: 0 0 1.5rem 0;">
+      Money, <span style="color: var(--lime);">clarified.</span>
+    </h1>
+
+    <!-- Short Description -->
+    <p class="reveal d2" style="font-size: 18px; line-height: 1.6; color: var(--muted); margin: 0 auto 4rem auto; max-width: 520px; font-weight: 500;">
+      Ledgr is a personal finance tracker built around clarity. It gives you the essential tools to track your money without the noise or clutter.
+    </p>
+
+    <!-- Features List -->
+    <div class="reveal d3" style="max-width: 440px; margin: 0 auto 4rem auto; text-align: left;">
+
+      <!-- Feature 1 -->
+      <div style="display: flex; gap: 1.5rem; position: relative;">
+        <!-- Circle and Line -->
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <div style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--lime); color: var(--lime); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; z-index: 2; background: var(--canvas);">
+            1
+          </div>
+          <div style="width: 2px; height: 100%; background: var(--line); margin: 0.5rem 0;"></div>
+        </div>
+        <!-- Text -->
+        <div style="padding-top: 0.25rem; padding-bottom: 2rem;">
+          <h3 style="margin: 0 0 0.25rem 0; color: var(--ink); font-size: 16px; font-weight: 600;">Transactions</h3>
+          <p style="margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5;">Log and track your daily income and expenses.</p>
+        </div>
+      </div>
+
+      <!-- Feature 2 -->
+      <div style="display: flex; gap: 1.5rem; position: relative;">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <div style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--lime); color: var(--lime); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; z-index: 2; background: var(--canvas);">
+            2
+          </div>
+          <div style="width: 2px; height: 100%; background: var(--line); margin: 0.5rem 0;"></div>
+        </div>
+        <div style="padding-top: 0.25rem; padding-bottom: 2rem;">
+          <h3 style="margin: 0 0 0.25rem 0; color: var(--ink); font-size: 16px; font-weight: 600;">Accounts</h3>
+          <p style="margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5;">Manage checking, savings, and credit cards.</p>
+        </div>
+      </div>
+
+      <!-- Feature 3 -->
+      <div style="display: flex; gap: 1.5rem; position: relative;">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <div style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--lime); color: var(--lime); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; z-index: 2; background: var(--canvas);">
+            3
+          </div>
+          <div style="width: 2px; height: 100%; background: var(--line); margin: 0.5rem 0;"></div>
+        </div>
+        <div style="padding-top: 0.25rem; padding-bottom: 2rem;">
+          <h3 style="margin: 0 0 0.25rem 0; color: var(--ink); font-size: 16px; font-weight: 600;">Categories</h3>
+          <p style="margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5;">Organize your spending into custom buckets.</p>
+        </div>
+      </div>
+
+      <!-- Feature 4 -->
+      <div style="display: flex; gap: 1.5rem; position: relative;">
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <div style="width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--lime); color: var(--lime); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px; flex-shrink: 0; z-index: 2; background: var(--canvas);">
+            4
+          </div>
+        </div>
+        <div style="padding-top: 0.25rem;">
+          <h3 style="margin: 0 0 0.25rem 0; color: var(--ink); font-size: 16px; font-weight: 600;">Dashboard</h3>
+          <p style="margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5;">Visualize your finances with clear charts.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Call to Action -->
+    <div class="reveal d4">
+      <a href="{% url 'finance:register_user' %}" class="btn-primary" style="width: auto; padding: 0 2.5rem; height: 48px; text-decoration: none; margin: 0 auto; display: inline-flex;">
+        Get started
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-left: 0.5rem;">
+          <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+        </svg>
+      </a>
+    </div>
+
+  </div>
+</main>
+{% endblock %}

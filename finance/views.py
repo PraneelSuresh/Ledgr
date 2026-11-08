@@ -9,9 +9,12 @@ from finance.filters import KindFilter, TimeFilter
 import datetime
 from django.db.models import Sum
 from django.db.models.functions import TruncMonth
+from django.core.paginator import Paginator
 
-def about(request):
-    return render(request, "finance/about.html")
+def homepage(request):
+    if request.user.is_authenticated:
+        return redirect("finance:transaction_list")
+    return render(request, "finance/homepage.html")
 
 def ping_json(request):
     return JsonResponse({"status": "ok"})
@@ -23,6 +26,9 @@ def transaction_list(request):
     transactions = kind_filter.qs
     time_filter = TimeFilter(request.GET, queryset=transactions)
     transactions = time_filter.qs
+    paginator = Paginator(transactions, 7)
+    page = request.GET.get('page')
+    transactions = paginator.get_page(page)
     context = {"transactions" : transactions, "time_filter" : time_filter, "kind_filter": kind_filter}
     return render(request, "finance/transactions.html", context)
 

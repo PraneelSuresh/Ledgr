@@ -5,7 +5,6 @@
 
 {% block content %}
 <div class="app-layout">
-
   <!-- Left Rail -->
   <aside class="sidebar reveal d1">
     <div class="sidebar-brand">
@@ -83,14 +82,14 @@
         </div>
 
         <div class="header-actions">
-          <form method="get" class="search-box">
+          <!--<form method="get" class="search-box">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
               stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8" />
               <path d="m21 21-4.3-4.3" />
             </svg>
             <input type="text" name="q" value="{{ request.GET.q|default:'' }}" placeholder="Search transactions..." />
-          </form>
+          </form> !-->
 
           <a class="btn-primary" href="{% url 'finance:add_transaction' %}">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -110,7 +109,8 @@
           {{ kind_filter.form }}
           {{ time_filter.form }}
 
-          <button class="btn-primary" type="submit" style="height: 36px; padding: 0 1rem; font-size: 14px; width: auto;">
+          <button class="btn-primary" type="submit"
+            style="height: 36px; padding: 0 1rem; font-size: 14px; width: auto;">
             Filter
           </button>
         </form>
@@ -173,8 +173,80 @@
           </tbody>
         </table>
       </div>
+      <!-- Pagination Controls -->
+      <!-- Pagination Controls -->
+      <div
+        style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 1.5rem; margin-bottom: 2rem;">
 
+        <!-- Previous Button -->
+        {% if transactions.has_previous %}
+        <a href="?page={{ transactions.previous_page_number }}" class="btn-secondary"
+          style="height: 40px; padding: 0 1rem; font-size: 14px; text-decoration: none; font-weight: 500;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem;">
+            <path d="M19 12H5" />
+            <path d="m12 19-7-7 7-7" />
+          </svg>
+          Previous
+        </a>
+        {% endif %}
+        <!-- Next Button -->
+        {% if transactions.has_next %}
+        <a href="?page={{ transactions.next_page_number }}" class="btn-primary"
+          style="height: 40px; width: auto; padding: 0 1rem; font-size: 14px; text-decoration: none; font-weight: 600;">
+          Next
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" style="margin-left: 0.5rem;">
+            <path d="M5 12h14" />
+            <path d="m12 5 7 7-7 7" />
+          </svg>
+        </a>
+        {% endif %}
+      </div>
     </div>
-  </main>
+    <nav class="mobile-bottom-nav">
+      <a href="{% url 'finance:transaction_list' %}"
+        class="mobile-nav-item {% if request.resolver_match.url_name == 'transaction_list' %}active{% endif %}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <line x1="8" y1="6" x2="21" y2="6"></line>
+          <line x1="8" y1="12" x2="21" y2="12"></line>
+          <line x1="8" y1="18" x2="21" y2="18"></line>
+          <line x1="3" y1="6" x2="3.01" y2="6"></line>
+          <line x1="3" y1="12" x2="3.01" y2="12"></line>
+          <line x1="3" y1="18" x2="3.01" y2="18"></line>
+        </svg>
+      </a>
+      <a href="{% url 'finance:view_dashboard' %}"
+        class="mobile-nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"></rect>
+          <rect x="14" y="3" width="7" height="7"></rect>
+          <rect x="14" y="14" width="7" height="7"></rect>
+          <rect x="3" y="14" width="7" height="7"></rect>
+        </svg>
+      </a>
+      <a href="{% url 'finance:category_list' %}"
+        class="mobile-nav-item {% if request.resolver_match.url_name == 'category_list' %}active{% endif %}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+          <line x1="7" y1="7" x2="7.01" y2="7"></line>
+        </svg>
+      </a>
+      <a href="{% url 'finance:accounts_list' %}"
+        class="mobile-nav-item {% if request.resolver_match.url_name == 'accounts_list' %}active{% endif %}">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+          stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="5" width="20" height="14" rx="2"></rect>
+          <line x1="2" y1="10" x2="22" y2="10"></line>
+        </svg>
+      </a>
+    </nav>
 </div>
+</main>
+</div>
+
+
 {% endblock %}
