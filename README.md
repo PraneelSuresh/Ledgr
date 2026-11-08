@@ -4,7 +4,7 @@ A local-first, privacy-focused personal finance tracker built with Django.
 
 Originally started as a Python CLI application (v1.0.0) and later refactored into a full-stack web application.
 
-![Dashboard Preview](link-to-your-image-here.png)
+<img width="1917" height="998" alt="image" src="https://github.com/user-attachments/assets/15390d1d-4004-4218-8b59-52525f464a37" />
 
 ## About The Project
 
