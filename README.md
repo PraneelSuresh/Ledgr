@@ -64,7 +64,7 @@ python manage.py migrate
 5. Create a superuser (admin account)
 ```bash
 python manage.py createsuperuser
-```bash
+```
 6. Start the development server
 ```bash
 python manage.py runserver
@@ -83,7 +83,7 @@ The tests cover:
 
 ## Installation (Windows Executable)
 
-If you build the .exe, add the download link here later.
+Currently Unavailable
 
 For non-developers, you can download the standalone Windows installer from the Releases tab on the right.
 
